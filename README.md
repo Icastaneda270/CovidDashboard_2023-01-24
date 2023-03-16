@@ -6,13 +6,12 @@ Data Source: https://ourworldindata.org/coronavirus
 
 ALL DATA IS DATED TO Janurary 24th, 2023
 
-Tables were slip into two in order to be uploaded to Tableau as files were larger than 25MB
+Tables were slip into two in order to be uploaded to Tableau as files were larger than 25MB (CovidDeaths.xlsx) (CovidVaccinations.xlsx)
 
+TableauTable1.xlsx: Display Global Death Percentage
 
-TableauTable1: Display Global Death Percentage
+TableauTable2.xlsx: Display Total Death Count by Continent
 
-TableauTable2: Display Total Death Count by Continent
+TableauTable3.xlsx: Percent of Population Infected Per Country
 
-TableauTable3: Percent of Population Infected Per Country
-
-TableauTable4: Percent of Population Infected Per Country By The Day
+TableauTable4.xlsx: Percent of Population Infected Per Country By The Day
