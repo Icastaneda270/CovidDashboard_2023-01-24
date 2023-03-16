@@ -1,0 +1,193 @@
+/*
+Covid-19 Data Analysis
+From 2020-01-22 To 2023-01-24
+-----------------------------
+"Is Not Null" eliminates data of locations which are not countries such as continents, social classes, and global data
+"Is Null" eliminates data of countries showing only continents, social classes, and global data
+*/
+
+SELECT *
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+order by 3,4
+
+--SELECT *
+--FROM CovidData..CovidVaccinations
+--order by 3,4
+
+
+--Data that will be used to begin project.
+
+SELECT Location, Date, New_Cases, Total_Cases, Total_Deaths, Population
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+--and location = 'United States'
+order by 1,2
+
+
+-- Total Cases vs Total Deaths
+-- Displays the likelihood of dying if covid is contracted in the selected country
+
+SELECT Location, Date, Total_Cases, Total_Deaths, (Total_Deaths/Total_Cases)*100 AS 'DeathPercentage'
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+and location = 'United States'
+order by 1,2
+
+
+-- Total Cases vs Population
+-- Displays the percentage of the population which has contracted Covid
+
+SELECT Location, Date, Population, Total_Cases, (total_cases/population)*100 AS 'PercentPopulationInfected'
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+and location = 'United States'
+order by 1,2
+
+
+-- Looking at countries with highest Infection rate compared to its population
+
+SELECT Location, Population, MAX(total_cases) as 'HighestInfectionCount', MAX((total_cases/population))*100 AS 'PercentPopulationInfected'
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+--and location = 'United States'
+Group by location, population
+order by 'PercentPopulationInfected' desc
+
+
+-- Displaying countries with highest death count compared to population
+
+SELECT Location, MAX(CAST(total_deaths as int)) as 'TotalDeathCount'
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+--and location = 'United States'
+Group by location
+order by 'TotalDeathCount' desc
+
+
+-- DATA BY CONTINENT
+
+
+-- Displaying CONTINENTS with highest death count compared to population
+-- Will remove income level for visualization
+
+SELECT Location, MAX(CAST(total_deaths as int)) as 'TotalDeathCount'
+FROM CovidData..CovidDeaths
+WHERE continent is null
+--and location = 'North America'
+and location not in ('World', 'European Union')
+and location not like '%income%'
+Group by location
+order by 'TotalDeathCount' desc
+
+
+-- Displays the likelihood of dying if covid is contracted in the selected countinent
+
+SELECT Location, Date, Total_Cases, Total_Deaths, (total_deaths/total_cases)*100 AS 'DeathPercentage'
+FROM CovidData..CovidDeaths
+WHERE continent is null
+and location = 'North America'
+--and location not in ('World', 'European Union')
+--and location not like '%income%'
+order by 1,2
+
+
+-- Displays the percentage of the population which has contracted Covid in the selected continent
+
+SELECT Location, Date, Population, Total_Cases, (total_cases/population)*100 AS 'PercentPopulationInfected'
+FROM CovidData..CovidDeaths
+WHERE continent is null
+and location = 'North America'
+--and location not in ('World', 'European Union')
+--and location not like '%income%'
+order by 1,2
+
+
+-- GLOBAL DATA
+
+
+-- Total Global death count
+
+SELECT Location, MAX(CAST(total_deaths as int)) as 'TotalDeathCount'
+FROM CovidData..CovidDeaths
+WHERE continent is null
+AND location = 'World'
+Group by location
+
+
+-- Displays the likelihood of dying if covid is contracted Globally
+
+SELECT Location, Date, Total_Cases, Total_Deaths, (total_deaths/total_cases)*100 AS 'DeathPercentage'
+FROM CovidData..CovidDeaths
+WHERE continent is null
+and location = 'World'
+order by 1,2
+
+
+-- Displays the percentage of the population which has contracted Covid Globally
+
+SELECT Location, Date, Population, Total_Cases, (total_cases/population)*100 AS 'PercentPopulationInfected'
+FROM CovidData..CovidDeaths
+WHERE continent is null
+and location = 'World'
+order by 1,2
+
+
+-- Total Population vs Population Fully Vaccinated
+-- Displays the percentage of population that is fully vaccinated
+-- USE Common Table Expression (CTE)
+
+With PopulationVsVaccinations (Continent, Location, Date, Population,People_Fully_Vaccinated)
+as
+(
+SELECT dea.continent, dea.location, dea.date, population, vac.people_fully_vaccinated
+FROM CovidData..CovidDeaths dea
+Join CovidData..CovidVaccinations vac
+	On dea.location = vac.location
+	and dea.date = vac.date
+WHERE dea.continent is not null
+)
+Select *, (people_fully_vaccinated/population)*100 as PercentagePopulationFullyVaccinated
+From PopulationVsVaccinations
+--WHERE location = 'United States'
+Order By 2,3
+
+-- TEMP TABLE
+
+Drop Table if exists #PercentPopulationVaccinated
+CREATE TABLE #PercentPopulationVaccinated
+(
+Continent nvarchar(255),
+Location nvarchar(255),
+Date date,
+Population float,
+People_Fully_Vaccinated float,
+)
+
+Insert into #PercentPopulationVaccinated
+SELECT dea.continent, dea.location, dea.date, population, vac.people_fully_vaccinated
+FROM CovidData..CovidDeaths dea
+Join CovidData..CovidVaccinations vac
+	On dea.location = vac.location
+	and dea.date = vac.date
+WHERE dea.continent is not null
+
+Select *, CAST(people_fully_vaccinated as float)/CAST(population as float)*100  as PercentagePopulationFullyVaccinated
+From #PercentPopulationVaccinated
+WHERE Location = 'United States'
+Order by 2,3
+
+
+-- Creating View to store data for visualization
+
+Create View PercentPopulationVaccinated as 
+SELECT dea.continent, dea.location, dea.date, population, vac.people_fully_vaccinated
+FROM CovidData..CovidDeaths dea
+Join CovidData..CovidVaccinations vac
+	On dea.location = vac.location
+	and dea.date = vac.date
+WHERE dea.continent is not null
+
+Select * , (people_fully_vaccinated/population)*100 as PercentagePopulationFullyVaccinated
+From PercentPopulationVaccinated
+order by 2,3

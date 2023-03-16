@@ -1,0 +1,39 @@
+/*
+Queries used for Tableau Dashboard
+*/
+
+-- 1. Display Global Death Percentage
+
+SELECT MAX(Total_Cases) as TotalCases, MAX(CAST(Total_Deaths as int)) as TotalDeaths, MAX(CAST(Total_Deaths as int))/MAX(Total_Cases)*100 as 'DeathPercentage' 
+FROM CovidData..CovidDeaths
+WHERE continent is null
+and location = 'World'
+
+
+-- 2. Display Total Death Count by Continent
+
+SELECT Location, MAX(CAST(total_deaths as int)) as 'TotalDeathCount'
+FROM CovidData..CovidDeaths
+WHERE continent is null
+and location not in ('World', 'European Union','International')
+and location not like '%income%'
+GROUP BY location
+ORDER BY 'TotalDeathCount' desc
+
+
+-- 3. Percent of Population Infected Per Country
+
+SELECT Location, Population, MAX(total_cases) as 'HighestInfectionCount', MAX((total_cases/population))*100 AS 'PercentPopulationInfected'
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+GROUP BY location, population
+ORDER BY 'PercentPopulationInfected' desc
+
+-- 4. Percent of Population Infected Per Country By The Day
+-- COALESCE replaces NULL values for "0" 
+
+SELECT Location, Convert(Date,Date) as Date, Population, COALESCE(MAX(total_cases),0) AS HighestInfectionCount, COALESCE(Max((total_cases / population)) * 100 ,0) as PercentPopulationInfected
+FROM CovidData..CovidDeaths
+WHERE continent is not null
+GROUP BY location, population, date
+ORDER BY PercentPopulationInfected desc
