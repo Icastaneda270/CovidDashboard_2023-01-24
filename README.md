@@ -2,6 +2,8 @@
 
 This project explores data concerning Covid-19 as of Janurary 24th, 2023
 
+Tableau Dashboard: https://public.tableau.com/app/profile/isaias.castaneda/viz/Covid-19Dashboard2023-01-24/COVID-19Dashboard2023-01-24
+
 Data Source: https://ourworldindata.org/coronavirus
 
 ALL DATA IS DATED TO Janurary 24th, 2023
