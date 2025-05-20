@@ -6,7 +6,7 @@ Tableau Dashboard: https://public.tableau.com/app/profile/isaias.castaneda/viz/C
 
 Data Source: https://ourworldindata.org/coronavirus
 
-Tables were slip into two in order to be uploaded to Tableau as files were larger than 25MB (CovidDeaths.xlsx) (CovidVaccinations.xlsx)
+Tables were split into two in order to be uploaded to Tableau as files were larger than 25MB (CovidDeaths.xlsx) (CovidVaccinations.xlsx)
 
 TableauTable1.xlsx: Display Global Death Percentage
 
